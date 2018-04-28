@@ -2,58 +2,12 @@ package main
 
 import (
     "fmt"
-    "os"
     qr "github.com/skip2/go-qrcode"
     term "github.com/nsf/termbox-go"
+    "github.com/konorlevich/EASA_RE-Fill_space/questions"
 )
 
-type SimpleQuestion struct {
-    text   string
-    answer rune
-}
-
-func (q SimpleQuestion) ask() {
-    term.Sync()
-    fmt.Println(q.text)
-
-keyPressListenerLoop:
-    for {
-        switch ev := term.PollEvent(); ev.Type {
-        case term.EventKey:
-            switch ev.Ch {
-            case q.answer:
-                break keyPressListenerLoop
-            default:
-                fmt.Println("Wrong key..")
-            }
-        case term.EventError:
-            panic(ev.Err)
-        }
-    }
-}
-
-type FinalQuestion struct {
-    text   string
-    answer string
-}
-
-func (q FinalQuestion) ask() {
-    term.Sync()
-    fmt.Println(q.text)
-
-finalWordLoop:
-    for {
-        var word string
-        fmt.Scanf("%s", &word)
-        if word == q.answer {
-            break finalWordLoop
-        }
-        fmt.Println("Try again...")
-    }
-
-}
-
-var finalQuestion = FinalQuestion{"You did it. Thank you, pilot.\n" +
+var finalQuestion = questions.FinalQuestion{"You did it. Thank you, pilot.\n" +
     "Now there is one thing I haven't told you - one more step to finish this program: \n" +
     "Save your own butt.\n" +
     "if you = architect then\n" +
@@ -68,7 +22,7 @@ var finalQuestion = FinalQuestion{"You did it. Thank you, pilot.\n" +
     "easa",
 }
 
-var simpleQuestions = [4] SimpleQuestion{
+var simpleQuestions = [4] questions.SimpleQuestion{
     {
         "Hello Pilot.\n" +
             "This is your Captain. If you are reading this message, I am already out of duties." +
@@ -125,13 +79,13 @@ func init() {
 
 func main() {
     for _, question := range simpleQuestions {
-        question.ask()
+        question.Ask()
     }
-
-    finalQuestion.ask()
+    finalQuestion.Ask()
     term.Sync()
     fmt.Println("\nGood job. Scan this QR code with your smartphone to see your score.")
     code.print()
-    //fmt.Scanf("%s")
-    os.Exit(0)
+    fmt.Println("Press any key to exit")
+    fmt.Scanf("%f")
+    term.Close()
 }
